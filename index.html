@@ -1,1 +1,31 @@
-Hello World!
+<!doctype html>
+<html>
+<head>
+    <title>Balanced Fault Calculator</title>
+    <meta name="description" content="Power System Balanced Fault">
+    <meta name="keywords" content="Power System Fault">
+    
+    <script  type="text/javascript" src="src/math.js"></script>
+    <link rel="stylesheet" href="src/index.css"
+</head>
+<body>
+    Power System Balanced Fault Calculator!
+    <script  type="text/javascript" src="src/psfault.js"></script>
+    <br>
+    <table id="bustable">
+    <thead>
+        <tr><td><b>Bus</b></td><td><b>Gen?</b></td><td><b>Umag</b></td><td><b>Uang</b></td></tr>
+    </thead>
+    <tbody>
+        <tr><td>1</td><td>1</td><td>1</td><td>0</td></tr>
+        <tr><td>2</td><td>0</td><td>1</td><td>0</td></tr>
+        <tr><td>3</td><td>0</td><td>1</td><td>0</td></tr>
+    </tbody>
+    </table>
+    <table id="linetable">
+        <tr><td><b>From Bus</b></td><td><b>To Bus</b></td><td><b>R</b></td><td><b>X</b></td></tr>
+        <tr><td>1</td><td>2</td><td>0.05</td><td>0.25</td></tr>
+        <tr><td>2</td><td>3</td><td>0.1</td><td>0.35</td></tr>
+    </table>
+</body>
+</html>
