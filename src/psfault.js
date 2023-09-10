@@ -1,24 +1,74 @@
 // basic line data
-//var K =  math.matrix([[1,2,0.1,0.25],
+//let K =  math.matrix([[1,2,0.1,0.25],
 //                    [3,4,0.1,0.25],
 //                    [2,5,0.08,0.2],
 //                    [4,5,0.08,0.2],
 //                    [5,6,0.2,0.15]]);
 
-//var Gens = math.matrix([[1, 1, 25],
+//let Gens = math.matrix([[1, 1, 25],
 //                        [3, 1, -5]]); // 3 org
 
-//var Fault = 6; // 6 org
+//let Fault = 6; // 6 org
+
+var NoBuses = 6;
+
+function addtoBusSelect(){
+    selects = document.querySelectorAll(".busselect")
+
+    for (let index = 0; index < selects.length; index++) {
+        let select = selects[index];
+        let option = document.createElement("option");
+        option.text = NoBuses.toString();
+        option.value = NoBuses;
+        select.add(option);        
+    };
+}
+
+function removefromBusSelect(){
+    selects = document.querySelectorAll(".busselect")
+
+    for (let i = 0; i < selects.length; i++) {
+        // iterate all selects
+        selectobject = selects[i];
+        for (let j = 0; j < selectobject.options.length; j++) {
+            if (selectobject.options[j].value == NoBuses+1){
+                selectobject.remove(j);
+                };
+        };
+    };
+}
 
 function addLine(){
-    var table = document.getElementById("linetable");
-    var row = table.insertRow(-1);
-    var from_bus = row.insertCell(0);
-    var to_bus = row.insertCell(1);
-    var Rpu = row.insertCell(2);
-    var Xpu = row.insertCell(3);
-    from_bus.innerHTML = '<input type="number" value="1" min="0" step="1"/>';
-    to_bus.innerHTML = '<input type="number" value="2" min="0" step="1"/>';
+    let table = document.getElementById("linetable");
+    let row = table.insertRow(-1);
+    let from_bus = row.insertCell(0);
+    let to_bus = row.insertCell(1);
+    let Rpu = row.insertCell(2);
+    let Xpu = row.insertCell(3);
+    from_bus_string = '<select name="From Bus" class="busselect">';
+    for (let i = 1; i < NoBuses+1; i++) {
+        if (i == 1) {
+            from_bus_string += '<option value="' + i.toString() + '" selected>' + i.toString() + '</option>'
+        } else {
+            from_bus_string += '<option value="' + i.toString() + '">' + i.toString() + '</option>'
+        }
+        
+    }
+    from_bus_string += '</select>';
+
+    to_bus_string = '<select name="To Bus" class="busselect">';
+    for (let i = 1; i < NoBuses+1; i++) {
+        if (i == 2) {
+            to_bus_string += '<option value="' + i.toString() + '" selected>' + i.toString() + '</option>'
+        } else {
+            to_bus_string += '<option value="' + i.toString() + '">' + i.toString() + '</option>'
+        }
+        
+    }
+    to_bus_string += '</select>';
+
+    from_bus.innerHTML = from_bus_string;
+    to_bus.innerHTML = to_bus_string;
     Rpu.innerHTML = '<input type="number" value="0.1" min="0" step="0.05"/>';
     Xpu.innerHTML = '<input type="number" value="0.25" min="0" step="0.05"/>';
 }
@@ -28,50 +78,178 @@ function removeLine() {
 }
   
 function resetLine(){
-    document.getElementById("linetable").innerHTML = '<tr><td><b>From Bus</b></td><td><b>To Bus</b></td><td><b>R [pu]</b></td><td><b>X [pu]</b></td></tr>\
-    <tr><td><input type="number" value="1" min="0" step="1"/></td>\
-        <td><input type="number" value="2" min="0" step="1"/></td>\
+document.getElementById("linetable").innerHTML = '<tr><td><b>From Bus</b></td><td><b>To Bus</b></td><td><b>R [pu]</b></td><td><b>X [pu]</b></td></tr>\
+    <tr><td><select name="From Bus" class="busselect">\
+        <option value="1" selected>1</option>\
+        <option value="2">2</option>\
+        <option value="3">3</option>\
+        <option value="4">4</option>\
+        <option value="5">5</option>\
+        <option value="6">6</option>\
+        </select></td>\
+        <td><select name="To Bus" class="busselect">\
+            <option value="1">1</option>\
+            <option value="2" selected>2</option>\
+            <option value="3">3</option>\
+            <option value="4">4</option>\
+            <option value="5">5</option>\
+            <option value="6">6</option>\
+            </select></td>\
         <td><input type="number" value="0.1" min="0" step="0.05"/></td>\
         <td><input type="number" value="0.25" min="0" step="0.05"/></td>\
     </tr>\
-    <tr><td><input type="number" value="3" min="0" step="1"/></td>\
-        <td><input type="number" value="4" min="0" step="1"/></td>\
+    <tr><td><select name="From Bus" class="busselect">\
+        <option value="1">1</option>\
+        <option value="2">2</option>\
+        <option value="3" selected>3</option>\
+        <option value="4">4</option>\
+        <option value="5">5</option>\
+        <option value="6">6</option>\
+        </select></td>\
+        <td><select name="To Bus" class="busselect">\
+            <option value="1">1</option>\
+            <option value="2">2</option>\
+            <option value="3">3</option>\
+            <option value="4" selected>4</option>\
+            <option value="5">5</option>\
+            <option value="6">6</option>\
+            </select></td>\
         <td><input type="number" value="0.1" min="0" step="0.05"/></td>\
         <td><input type="number" value="0.25" min="0" step="0.05"/></td>\
     </tr>\
-    <tr><td><input type="number" value="2" min="0" step="1"/></td>\
-        <td><input type="number" value="5" min="0" step="1"/></td>\
+    <tr><td><select name="From Bus" class="busselect">\
+        <option value="1">1</option>\
+        <option value="2" selected>2</option>\
+        <option value="3">3</option>\
+        <option value="4">4</option>\
+        <option value="5">5</option>\
+        <option value="6">6</option>\
+        </select></td>\
+        <td><select name="To Bus" class="busselect">\
+            <option value="1">1</option>\
+            <option value="2">2</option>\
+            <option value="3">3</option>\
+            <option value="4">4</option>\
+            <option value="5" selected>5</option>\
+            <option value="6">6</option>\
+            </select></td>\
         <td><input type="number" value="0.08" min="0" step="0.05"/></td>\
         <td><input type="number" value="0.2" min="0" step="0.05"/></td>\
     </tr>\
-    <tr><td><input type="number" value="4" min="0" step="1"/></td>\
-        <td><input type="number" value="5" min="0" step="1"/></td>\
+    <tr><td><select name="From Bus" class="busselect">\
+        <option value="1">1</option>\
+        <option value="2">2</option>\
+        <option value="3">3</option>\
+        <option value="4" selected>4</option>\
+        <option value="5">5</option>\
+        <option value="6">6</option>\
+        </select></td>\
+        <td><select name="To Bus" class="busselect">\
+            <option value="1">1</option>\
+            <option value="2">2</option>\
+            <option value="3">3</option>\
+            <option value="4">4</option>\
+            <option value="5" selected>5</option>\
+            <option value="6">6</option>\
+            </select></td>\
         <td><input type="number" value="0.08" min="0" step="0.05"/></td>\
         <td><input type="number" value="0.2" min="0" step="0.05"/></td>\
     </tr>\
-    <tr><td><input type="number" value="5" min="0" step="1"/></td>\
-        <td><input type="number" value="6" min="0" step="1"/></td>\
+    <tr><td><select name="From Bus" class="busselect">\
+        <option value="1">1</option>\
+        <option value="2">2</option>\
+        <option value="3">3</option>\
+        <option value="4">4</option>\
+        <option value="5" selected>5</option>\
+        <option value="6">6</option>\
+        </select></td>\
+        <td><select name="To Bus" class="busselect">\
+            <option value="1">1</option>\
+            <option value="2">2</option>\
+            <option value="3">3</option>\
+            <option value="4">4</option>\
+            <option value="5">5</option>\
+            <option value="6" selected>6</option>\
+            </select></td>\
         <td><input type="number" value="0.2" min="0" step="0.05"/></td>\
         <td><input type="number" value="0.15" min="0" step="0.05"/></td>\
     </tr>';
 }
 
+function addBus(){
+    let table = document.getElementById("bustable");
+    NoBuses++;
+    let row = table.insertRow(-1);
+    let busno = row.insertCell(0);
+    let gen = row.insertCell(1);
+    let Umag = row.insertCell(2);
+    let Uang = row.insertCell(3);
+    busno.innerHTML = NoBuses.toString();
+    gen.innerHTML = '<input type="checkbox">';
+    Umag.innerHTML = '<input type="number" value="1" min="0">';
+    Uang.innerHTML = '<input type="number" value="0">';
+    addtoBusSelect();
+}
+  
+function removeBus() {
+    document.getElementById("bustable").deleteRow(-1);
+    NoBuses--;
+    removefromBusSelect();
+}
+
+function resetBus(){
+    document.getElementById("bustable").innerHTML = '<thead>\
+    <tr><td><b>Bus</b></td><td><b>Gen?</b></td><td><b>Umag [pu]</b></td><td><b>Uang [&deg]</b></td></tr>\
+    </thead>\
+    <tbody>\
+        <tr><td>1</td>\
+            <td><input type="checkbox" checked></td>\
+            <td><input type="number" value="1" min="0"></td>\
+            <td><input type="number" value="0"></td></tr>\
+        <tr><td>2</td>\
+            <td><input type="checkbox" ></td>\
+            <td><input type="number" value="1" min="0"></td>\
+            <td><input type="number" value="0"></td></tr>\
+        <tr><td>3</td>\
+            <td><input type="checkbox" checked></td>\
+            <td><input type="number" value="1" min="0"></td>\
+            <td><input type="number" value="0"></td></tr>\
+        <tr><td>4</td>\
+            <td><input type="checkbox" ></td>\
+            <td><input type="number" value="1" min="0"></td>\
+            <td><input type="number" value="0"></td></tr>\
+        <tr><td>5</td>\
+            <td><input type="checkbox"></td>\
+            <td><input type="number" value="1" min="0"></td>\
+            <td><input type="number" value="0"></td></tr>\
+        <tr><td>6</td>\
+            <td><input type="checkbox" ></td>\
+            <td><input type="number" value="1" min="0"></td>\
+            <td><input type="number" value="0"></td></tr>\
+    </tbody>';
+    NoBuses = 6;
+}
+
+function resetAll(){
+    resetBus();
+    resetLine();
+}
 function readBusTable(){
-    var table = document.getElementById("bustable");
+    let table = document.getElementById("bustable");
     firstgen = false;
-    for (var i = 1, row; row = table.rows[i]; i++) {
+    for (let i = 1, row; row = table.rows[i]; i++) {
     //iterate through rows
     //rows would be accessed using the "row" variable assigned in the for loop
         if (row.cells[1].firstChild.checked) {
             // only parse generator buses
             temp = math.zeros(1,3);
-            for (var j = 0, col; col = row.cells[j]; j++) {
+            for (let j = 0, col; col = row.cells[j]; j++) {
                 //iterate through columns
                 //columns would be accessed using the "col" variable assigned in the for loop
                 switch (j) {
                     case 0:
                         // bus number
-                        temp.subset(math.index(0,0), Number(col.firstChild.value));
+                        temp.subset(math.index(0,0), Number(col.innerText));
                         break;
                     //case 1:
                         // Gen or not
@@ -102,13 +280,13 @@ function readBusTable(){
 }
 
 function readLineTable(){
-    var table = document.getElementById("linetable");
+    let table = document.getElementById("linetable");
     firstline = false;
-    for (var i = 1, row; row = table.rows[i]; i++) {
+    for (let i = 1, row; row = table.rows[i]; i++) {
     //iterate through rows
     //rows would be accessed using the "row" variable assigned in the for loop
         temp = math.zeros(1,4);
-        for (var j = 0, col; col = row.cells[j]; j++) {
+        for (let j = 0, col; col = row.cells[j]; j++) {
             //iterate through columns
             //columns would be accessed using the "col" variable assigned in the for loop
             switch (j) {
@@ -224,11 +402,11 @@ function generateYmatrix(K){
     size = math.size(K);
     lines = size.subset(math.index(0));
     
-    var N = math.max(
+    let N = math.max(
         math.subset(K, math.index(math.range(0, lines), math.range(0,2))));
 
     // create zero matrix
-    var Y = math.zeros(N,N);
+    let Y = math.zeros(N,N);
 
     for (let index = 0; index < lines; index++) {
         // iterate over each line
@@ -254,12 +432,12 @@ function generateYmatrix(K){
 
 function shiftYmatrix(Y, N, Gens, Fault){
     let Yshifted = math.clone(Y);
-    var size_gen =  math.size(Gens);
+    let size_gen =  math.size(Gens);
     Ngen = size_gen.subset(math.index(0));
     Nknown = Ngen + 1;
     
-    var Uknown = math.zeros(Nknown);
-    var knownbuses = [];
+    let Uknown = math.zeros(Nknown);
+    let knownbuses = [];
 
     for (let index = 0; index < Ngen; index++) {
         tempUmag = math.subset(Gens, math.index(index,1));
@@ -273,7 +451,7 @@ function shiftYmatrix(Y, N, Gens, Fault){
 
     knownbuses = math.sort(knownbuses)
 
-    var busorder = math.matrix([math.range(1,N+1)]);
+    let busorder = math.matrix([math.range(1,N+1)]);
 
     for (let index = 0; index < Nknown; index++) {
         // Switch Rows and Columns
@@ -322,13 +500,13 @@ function swapMatrixCols(A, col1, col2) {
 
 function degrees_to_radians(degrees)
 {
-  var pi = math.pi;
+  let pi = math.pi;
   return degrees * (pi/180);
 }
 
 function radians_to_degrees(radians)
 {
-  var pi = math.pi;
+  let pi = math.pi;
   return radians * (180/pi);
 }
 
@@ -369,10 +547,10 @@ function printResults(Ures, Ires){
     <tbody>';
 
     for (let index = 0; index < N; index++) {
-        var Umag = math.abs(Ures.subset(math.index(index,0)));
-        var Uang = radians_to_degrees(math.arg(Ures.subset(math.index(index,0))));
-        var Imag = math.abs(Ires.subset(math.index(index,0)));
-        var Iang = radians_to_degrees(math.arg(Ires.subset(math.index(index,0))));
+        let Umag = math.abs(Ures.subset(math.index(index,0)));
+        let Uang = radians_to_degrees(math.arg(Ures.subset(math.index(index,0))));
+        let Imag = math.abs(Ires.subset(math.index(index,0)));
+        let Iang = radians_to_degrees(math.arg(Ires.subset(math.index(index,0))));
 
         html_string += '<tr>\
         <td>' + (index+1).toString() + '</td>\
