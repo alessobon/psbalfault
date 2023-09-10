@@ -4,9 +4,18 @@
     <title>Balanced Fault Calculator</title>
     <meta name="description" content="Power System Balanced Fault">
     <meta name="keywords" content="Power System Fault">
-    
+    <link rel="icon" type="image/x-icon" href="/fig/favicon.ico">
     <script  type="text/javascript" src="src/math.js"></script>
     <link rel="stylesheet" href="index.css">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-VP2BSHNMM3"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-VP2BSHNMM3');
+</script>
 </head>
 
 <body>
@@ -78,6 +87,8 @@
             <td><input type="number" value="0.15" min="0" step="0.05"/></td>
         </tr>
     </table>
+    <button onclick="addLine()">Add line</button> <button onclick="removeLine()">Remove line</button> <button onclick="resetLine()">Reset lines</button>
+    <br>
     Fault Bus: <input type="number" value="6" min="1" step="1" id="faultbus">
     <button onclick="calculateSolidFault()">Calculate</button>
 </div>
