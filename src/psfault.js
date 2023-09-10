@@ -10,6 +10,52 @@
 
 //var Fault = 6; // 6 org
 
+function addLine(){
+    var table = document.getElementById("linetable");
+    var row = table.insertRow(-1);
+    var from_bus = row.insertCell(0);
+    var to_bus = row.insertCell(1);
+    var Rpu = row.insertCell(2);
+    var Xpu = row.insertCell(3);
+    from_bus.innerHTML = '<input type="number" value="1" min="0" step="1"/>';
+    to_bus.innerHTML = '<input type="number" value="2" min="0" step="1"/>';
+    Rpu.innerHTML = '<input type="number" value="0.1" min="0" step="0.05"/>';
+    Xpu.innerHTML = '<input type="number" value="0.25" min="0" step="0.05"/>';
+}
+  
+function removeLine() {
+    document.getElementById("linetable").deleteRow(-1);
+}
+  
+function resetLine(){
+    document.getElementById("linetable").innerHTML = '<tr><td><b>From Bus</b></td><td><b>To Bus</b></td><td><b>R [pu]</b></td><td><b>X [pu]</b></td></tr>\
+    <tr><td><input type="number" value="1" min="0" step="1"/></td>\
+        <td><input type="number" value="2" min="0" step="1"/></td>\
+        <td><input type="number" value="0.1" min="0" step="0.05"/></td>\
+        <td><input type="number" value="0.25" min="0" step="0.05"/></td>\
+    </tr>\
+    <tr><td><input type="number" value="3" min="0" step="1"/></td>\
+        <td><input type="number" value="4" min="0" step="1"/></td>\
+        <td><input type="number" value="0.1" min="0" step="0.05"/></td>\
+        <td><input type="number" value="0.25" min="0" step="0.05"/></td>\
+    </tr>\
+    <tr><td><input type="number" value="2" min="0" step="1"/></td>\
+        <td><input type="number" value="5" min="0" step="1"/></td>\
+        <td><input type="number" value="0.08" min="0" step="0.05"/></td>\
+        <td><input type="number" value="0.2" min="0" step="0.05"/></td>\
+    </tr>\
+    <tr><td><input type="number" value="4" min="0" step="1"/></td>\
+        <td><input type="number" value="5" min="0" step="1"/></td>\
+        <td><input type="number" value="0.08" min="0" step="0.05"/></td>\
+        <td><input type="number" value="0.2" min="0" step="0.05"/></td>\
+    </tr>\
+    <tr><td><input type="number" value="5" min="0" step="1"/></td>\
+        <td><input type="number" value="6" min="0" step="1"/></td>\
+        <td><input type="number" value="0.2" min="0" step="0.05"/></td>\
+        <td><input type="number" value="0.15" min="0" step="0.05"/></td>\
+    </tr>';
+}
+
 function readBusTable(){
     var table = document.getElementById("bustable");
     firstgen = false;
@@ -107,11 +153,24 @@ function calculateSolidFault(){
     K = readLineTable();
     Fault = readFaultBus();
 
-    resgen = generateYmatrix(K);
+    try {
+        resgen = generateYmatrix(K);
+    } catch (error) {
+        console.log(error)
+        document.getElementById("resultsdiv").innerHTML = "Underdefined, no solution found";
+        return; 
+    }
+    
     Y = resgen[0];
     N = resgen[1];
 
-    resshift = shiftYmatrix(Y, N, Gens, Fault);
+    try {
+        resshift = shiftYmatrix(Y, N, Gens, Fault);
+    } catch (error) {
+        console.log(error)
+        document.getElementById("resultsdiv").innerHTML = "Underdefined, no solution found";
+        return; 
+    }   
 
     Yshifted = resshift[0];
     Uknown = resshift[1];
@@ -130,10 +189,23 @@ function calculateSolidFault(){
     D = Yshifted.subset(math.index(math.range(NIuknown, N), math.range(NUknown, N)));
 
     // solve for uknown voltages
-    Uuknown = math.multiply(math.inv(D), math.subtract(Iknown, math.multiply(C, Uknown)));
+    try {
+        Uuknown = math.multiply(math.inv(D), math.subtract(Iknown, math.multiply(C, Uknown)));
+    } catch (error) {
+        console.log(error)
+        document.getElementById("resultsdiv").innerHTML = "Underdefined, no solution found";
+        return;
+    }
+    
 
     // solve for uknown currents
-    Iuknown = math.add(math.multiply(A, Uknown), math.multiply(B, Uuknown));
+    try {
+        Iuknown = math.add(math.multiply(A, Uknown), math.multiply(B, Uuknown));
+    } catch (error) {
+        console.log(error)
+        document.getElementById("resultsdiv").innerHTML = "Underdefined, no solution found";
+        return;
+    }
 
     Ures_unordered = math.concat(Uknown, Uuknown, 0);
     Ires_unordered = math.concat(Iuknown, Iknown, 0);
@@ -144,6 +216,7 @@ function calculateSolidFault(){
 
     // print results
     printResults(Ures, Ires);
+    return;
 };
 
 function generateYmatrix(K){
