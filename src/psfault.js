@@ -1,26 +1,150 @@
-var Y = math.matrix()
-
 // basic line data
-var K =  math.matrix([[1,2,0.1,0.25],
-                    [3,4,0.1,0.25],
-                    [2,5,0.08,0.2],
-                    [4,5,0.08,0.2],
-                    [5,6,0.2,0.15]]);
+//var K =  math.matrix([[1,2,0.1,0.25],
+//                    [3,4,0.1,0.25],
+//                    [2,5,0.08,0.2],
+//                    [4,5,0.08,0.2],
+//                    [5,6,0.2,0.15]]);
 
-var Gens = math.matrix([[1, 1.01],
-                        [3, 1]]); // 3 org
+//var Gens = math.matrix([[1, 1, 25],
+//                        [3, 1, -5]]); // 3 org
 
-var Fault = 6; // 6 org
-resgen = generateYmatrix(K);
-Y = resgen[0];
-N = resgen[1];
+//var Fault = 6; // 6 org
 
-resshift = shiftYmatrix(Y, N, Gens, Fault);
+function readBusTable(){
+    var table = document.getElementById("bustable");
+    firstgen = false;
+    for (var i = 1, row; row = table.rows[i]; i++) {
+    //iterate through rows
+    //rows would be accessed using the "row" variable assigned in the for loop
+        if (row.cells[1].firstChild.checked) {
+            // only parse generator buses
+            temp = math.zeros(1,3);
+            for (var j = 0, col; col = row.cells[j]; j++) {
+                //iterate through columns
+                //columns would be accessed using the "col" variable assigned in the for loop
+                switch (j) {
+                    case 0:
+                        // bus number
+                        temp.subset(math.index(0,0), Number(col.firstChild.value));
+                        break;
+                    //case 1:
+                        // Gen or not
+                        //console.log(col.firstChild.checked);
+                        //break;
+                    case 2:
+                        // Umag number
+                        temp.subset(math.index(0,1), Number(col.firstChild.value));
+                        break;
+                    case 3:
+                        // Uang number
+                        temp.subset(math.index(0,2), Number(col.firstChild.value));
+                        break;
+                    default:
+                        //console.log(col.firstChild.value);
+                        break;
+                };
+            };
+            if (!firstgen) {
+                firstgen = true;
+                Gens = math.clone(temp);
+            } else {
+                Gens = math.concat(Gens, temp, 0);
+            };  
+        };
+    };
+    return Gens
+}
 
-Yshifted = resshift[0];
-Uknown = resshift[1];
-busorder = resshift[2];
+function readLineTable(){
+    var table = document.getElementById("linetable");
+    firstline = false;
+    for (var i = 1, row; row = table.rows[i]; i++) {
+    //iterate through rows
+    //rows would be accessed using the "row" variable assigned in the for loop
+        temp = math.zeros(1,4);
+        for (var j = 0, col; col = row.cells[j]; j++) {
+            //iterate through columns
+            //columns would be accessed using the "col" variable assigned in the for loop
+            switch (j) {
+                case 0:
+                    // from bus number
+                    temp.subset(math.index(0,0), Number(col.firstChild.value));
+                    break;
+                case 1:
+                    // to bus number
+                    temp.subset(math.index(0,1), Number(col.firstChild.value));
+                    break;
+                case 2:
+                    // Rpu 
+                    temp.subset(math.index(0,2), Number(col.firstChild.value));
+                    break;
+                case 3:
+                    // Xpu
+                    temp.subset(math.index(0,3), Number(col.firstChild.value));
+                    break;
+                default:
+                    //console.log(col.firstChild.value);
+                    break;
+            };
+        };
+        if (!firstline) {
+            firstline = true;
+            K = math.clone(temp);
+        } else {
+            K = math.concat(K, temp, 0);
+        };  
+    };
+    return K
+}
 
+function readFaultBus(){
+    return Number(document.getElementById("faultbus").value)
+}
+
+function calculateSolidFault(){
+
+    Gens = readBusTable();
+    K = readLineTable();
+    Fault = readFaultBus();
+
+    resgen = generateYmatrix(K);
+    Y = resgen[0];
+    N = resgen[1];
+
+    resshift = shiftYmatrix(Y, N, Gens, Fault);
+
+    Yshifted = resshift[0];
+    Uknown = resshift[1];
+    busorder = resshift[2];
+
+    // create Iknown
+    NUknown = math.subset(math.size(Uknown), math.index(0));    // Number of known voltages (generators + fault bus)
+    NIknown = N - NUknown;                                       // Number of known currents (non gen or fault buses)
+    NIuknown = NUknown;                                         // Number of unknown voltages
+    Iknown = math.zeros(NIknown,1);
+
+    // split admittance matrix
+    A = Yshifted.subset(math.index(math.range(0, NIuknown), math.range(0, NUknown)));
+    B = Yshifted.subset(math.index(math.range(0, NIuknown), math.range(NUknown, N)));
+    C = Yshifted.subset(math.index(math.range(NIuknown, N), math.range(0, NUknown)));
+    D = Yshifted.subset(math.index(math.range(NIuknown, N), math.range(NUknown, N)));
+
+    // solve for uknown voltages
+    Uuknown = math.multiply(math.inv(D), math.subtract(Iknown, math.multiply(C, Uknown)));
+
+    // solve for uknown currents
+    Iuknown = math.add(math.multiply(A, Uknown), math.multiply(B, Uuknown));
+
+    Ures_unordered = math.concat(Uknown, Uuknown, 0);
+    Ires_unordered = math.concat(Iuknown, Iknown, 0);
+
+    // reorder results
+    Ures = reorderResults(Ures_unordered, busorder);
+    Ires = reorderResults(Ires_unordered, busorder);
+
+    // print results
+    printResults(Ures, Ires);
+};
 
 function generateYmatrix(K){
     // find highest bus numbers
@@ -65,7 +189,10 @@ function shiftYmatrix(Y, N, Gens, Fault){
     var knownbuses = [];
 
     for (let index = 0; index < Ngen; index++) {
-        Uknown.subset(math.index(index,0), math.subset(Gens, math.index(index,1))); 
+        tempUmag = math.subset(Gens, math.index(index,1));
+        tempUang = degrees_to_radians(math.subset(Gens, math.index(index,2)));
+        tempU = math.complex({r: tempUmag, phi: tempUang});
+        Uknown.subset(math.index(index,0), tempU); 
         knownbuses.push(math.subset(Gens,  math.index(index,0)))  
     }
     Uknown.subset(math.index(Nknown-1,0), 0);
@@ -118,4 +245,72 @@ function swapMatrixCols(A, col1, col2) {
     swapped.subset(math.index(math.range(0,rows), col2), A.subset(math.index(math.range(0,rows), col1)));
     
     return swapped;
+}
+
+function degrees_to_radians(degrees)
+{
+  var pi = math.pi;
+  return degrees * (pi/180);
+}
+
+function radians_to_degrees(radians)
+{
+  var pi = math.pi;
+  return radians * (180/pi);
+}
+
+function reorderResults(unordered, busorder){
+    N = math.subset(math.size(busorder),math.index(1));
+
+    res = math.zeros(N,1);
+
+    for (let index = 0; index < N; index++) {
+        // get order index
+
+        index_while = 0;
+        while (index_while < N) {
+            if (index == (busorder.subset(math.index(0,index_while)) -1)) {
+                // correct index
+                order_index = index_while;
+                break;
+            } 
+            index_while++;
+        }
+        val = unordered.subset(math.index(order_index,0));
+        
+        res.subset(math.index(index,0), val);
+        
+    }
+    return res;
+}
+
+function printResults(Ures, Ires){
+    N = math.subset(math.size(Ures),math.index(0));
+    resultdiv = document.getElementById("resultsdiv");
+    decimals = 3;
+
+    html_string = 'Results<br><table id="resulttable">\
+    <thead>\
+    <tr><td><b>Bus</b></td><td><b>Umag [pu]</b></td><td><b>Uang [&deg]</b></td><td><b>Imag [pu]</b></td><td><b>Iang [&deg]</b></td></tr>\
+    </thead>\
+    <tbody>';
+
+    for (let index = 0; index < N; index++) {
+        var Umag = math.abs(Ures.subset(math.index(index,0)));
+        var Uang = radians_to_degrees(math.arg(Ures.subset(math.index(index,0))));
+        var Imag = math.abs(Ires.subset(math.index(index,0)));
+        var Iang = radians_to_degrees(math.arg(Ires.subset(math.index(index,0))));
+
+        html_string += '<tr>\
+        <td>' + (index+1).toString() + '</td>\
+        <td>' + Number(Umag).toFixed(decimals).toString() + '</td>\
+        <td>' + Number(Uang).toFixed(decimals).toString() + '</td>\
+        <td>' + Number(Imag).toFixed(decimals).toString() + '</td>\
+        <td>' + Number(Iang).toFixed(decimals).toString() + '</td>\
+        </tr>';        
+    }
+
+    html_string += '</tbody></table>';
+    
+    resultdiv.innerHTML = html_string;
 }
