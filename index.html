@@ -1,1 +1,88 @@
-Hello World!
+<!DOCTYPE  html>
+<html>
+<head>
+    <title>Balanced Fault Calculator</title>
+    <meta name="description" content="Power System Balanced Fault">
+    <meta name="keywords" content="Power System Fault">
+    
+    <script  type="text/javascript" src="src/math.js"></script>
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+    Power System Balanced Fault Calculator!
+    <script  type="text/javascript" src="src/psfault.js"></script>
+    <br>
+<div>
+    <table id="bustable">
+    <thead>
+        <tr><td><b>Bus</b></td><td><b>Gen?</b></td><td><b>Umag</b></td><td><b>Uang</b></td></tr>
+    </thead>
+    <tbody>
+        <tr><td><input type="number" value="1" min="0" step="1"/></td>
+            <td><input type="checkbox" checked></td>
+            <td><input type="number" value="1" min="0"></td>
+            <td><input type="number" value="0" min="0"></td></tr>
+
+        <tr><td><input type="number" value="2" min="0" step="1"/></td>
+            <td><input type="checkbox" ></td>
+            <td><input type="number" value="1" min="0"></td>
+            <td><input type="number" value="0" min="0"></td></tr>
+
+        <tr><td><input type="number" value="3" min="0" step="1"/></td>
+            <td><input type="checkbox" checked></td>
+            <td><input type="number" value="1" min="0"></td>
+            <td><input type="number" value="0" min="0"></td></tr>
+
+        <tr><td><input type="number" value="4" min="0" step="1"/></td>
+            <td><input type="checkbox" ></td>
+            <td><input type="number" value="1" min="0"></td>
+            <td><input type="number" value="0" min="0"></td></tr>
+
+        <tr><td><input type="number" value="5" min="0" step="1"/></td>
+            <td><input type="checkbox"></td>
+            <td><input type="number" value="1" min="0"></td>
+            <td><input type="number" value="0" min="0"></td></tr>
+
+        <tr><td><input type="number" value="6" min="0" step="1"/></td>
+            <td><input type="checkbox" ></td>
+            <td><input type="number" value="1" min="0"></td>
+            <td><input type="number" value="0" min="0"></td></tr>
+    </tbody>
+    </table>
+    <table id="linetable">
+        <tr><td><b>From Bus</b></td><td><b>To Bus</b></td><td><b>R</b></td><td><b>X</b></td></tr>
+        <tr><td><input type="number" value="1" min="0" step="1"/></td>
+            <td><input type="number" value="2" min="0" step="1"/></td>
+            <td><input type="number" value="0.1" min="0" step="0.05"/></td>
+            <td><input type="number" value="0.25" min="0" step="0.05"/></td>
+        </tr>
+        <tr><td><input type="number" value="3" min="0" step="1"/></td>
+            <td><input type="number" value="4" min="0" step="1"/></td>
+            <td><input type="number" value="0.1" min="0" step="0.05"/></td>
+            <td><input type="number" value="0.25" min="0" step="0.05"/></td>
+        </tr>
+        <tr><td><input type="number" value="2" min="0" step="1"/></td>
+            <td><input type="number" value="5" min="0" step="1"/></td>
+            <td><input type="number" value="0.08" min="0" step="0.05"/></td>
+            <td><input type="number" value="0.2" min="0" step="0.05"/></td>
+        </tr>
+        <tr><td><input type="number" value="4" min="0" step="1"/></td>
+            <td><input type="number" value="5" min="0" step="1"/></td>
+            <td><input type="number" value="0.08" min="0" step="0.05"/></td>
+            <td><input type="number" value="0.2" min="0" step="0.05"/></td>
+        </tr>
+        <tr><td><input type="number" value="5" min="0" step="1"/></td>
+            <td><input type="number" value="6" min="0" step="1"/></td>
+            <td><input type="number" value="0.2" min="0" step="0.05"/></td>
+            <td><input type="number" value="0.15" min="0" step="0.05"/></td>
+        </tr>
+    </table>
+    Fault Bus: <input type="number" value="6" min="1" step="1" id="faultbus">
+    <button onclick="calculateSolidFault()">Calculate</button>
+</div>
+<br>
+<div id="resultsdiv"></div>
+
+</body>
+</html>
