@@ -423,8 +423,8 @@ function generateYmatrix(K){
         Y.subset(math.index(to_bus-1, to_bus-1), math.add(Y.subset(math.index(to_bus-1, to_bus-1)), Ypu));
 
         // admittance between buses
-        Y.subset(math.index(from_bus-1, to_bus-1),  Ypu.neg());
-        Y.subset(math.index(to_bus-1, from_bus-1),  Ypu.neg());    
+        Y.subset(math.index(from_bus-1, to_bus-1),  math.add(Y.subset(math.index(from_bus-1, to_bus-1)), Ypu.neg()));
+        Y.subset(math.index(to_bus-1, from_bus-1),  math.add(Y.subset(math.index(to_bus-1, from_bus-1)), Ypu.neg()));    
     };
 
     return [Y, N]
