@@ -342,55 +342,25 @@ function calculateSolidFault(){
     Y = resgen[0];
     N = resgen[1];
 
-    try {
-        resshift = shiftYmatrix(Y, N, Gens, Fault);
-    } catch (error) {
-        console.log(error)
-        document.getElementById("resultsdiv").innerHTML = "Underdefined, no solution found";
-        return; 
-    }   
+    Z = math.inv(Y); // Ybus matrix
 
-    Yshifted = resshift[0];
-    Uknown = resshift[1];
-    busorder = resshift[2];
+    console.log(Z);
 
-    // create Iknown
-    NUknown = math.subset(math.size(Uknown), math.index(0));    // Number of known voltages (generators + fault bus)
-    NIknown = N - NUknown;                                       // Number of known currents (non gen or fault buses)
-    NIuknown = NUknown;                                         // Number of unknown voltages
-    Iknown = math.zeros(NIknown,1);
+    prefault_vol = 1.0;
+    Zf = 1.0;
 
-    // split admittance matrix
-    A = Yshifted.subset(math.index(math.range(0, NIuknown), math.range(0, NUknown)));
-    B = Yshifted.subset(math.index(math.range(0, NIuknown), math.range(NUknown, N)));
-    C = Yshifted.subset(math.index(math.range(NIuknown, N), math.range(0, NUknown)));
-    D = Yshifted.subset(math.index(math.range(NIuknown, N), math.range(NUknown, N)));
+    Upre = math.ones(N, 1); // prefault voltages
 
-    // solve for uknown voltages
-    try {
-        Uuknown = math.multiply(math.inv(D), math.subtract(Iknown, math.multiply(C, Uknown)));
-    } catch (error) {
-        console.log(error)
-        document.getElementById("resultsdiv").innerHTML = "Underdefined, no solution found";
-        return;
-    }
-    
+    If = math.divide(math.subset(Upre, math.index(Fault-1, 0)), math.add(math.subset(Z, math.index(Fault-1, Fault-1)), Zf)); // Ikf = Uk(0)/(Zkk + Zf)
 
-    // solve for uknown currents
-    try {
-        Iuknown = math.add(math.multiply(A, Uknown), math.multiply(B, Uuknown));
-    } catch (error) {
-        console.log(error)
-        document.getElementById("resultsdiv").innerHTML = "Underdefined, no solution found";
-        return;
-    }
+    deltaI = math.zeros(N,1);
+    deltaI = math.subset(deltaI, math.index(Fault-1,0), If);
 
-    Ures_unordered = math.concat(Uknown, Uuknown, 0);
-    Ires_unordered = math.concat(Iuknown, Iknown, 0);
+    deltaU = math.multiply(Z, deltaI);
 
-    // reorder results
-    Ures = reorderResults(Ures_unordered, busorder);
-    Ires = reorderResults(Ires_unordered, busorder);
+    Ures = math.subtract(Upre, deltaU); // Ures = Upre - deltaU = Upre - Zik*Ik(F)
+
+    Ires = math.zeros(N, 1);
 
     // print results
     printResults(Ures, Ires);
@@ -429,6 +399,7 @@ function generateYmatrix(K){
 
     return [Y, N]
 };
+
 
 function shiftYmatrix(Y, N, Gens, Fault){
     let Yshifted = math.clone(Y);
